@@ -46,9 +46,11 @@ import java.io.File;
 import java.lang.invoke.MethodHandles;
 
 public class MeteorClient implements ClientModInitializer {
-    public static final String MOD_ID = "meteor-client";
+    // Đổi ID mod ở đây (chỉ chữ thường, không dấu cách)
+    public static final String MOD_ID = "sieucapyeuem";
     public static final ModMetadata MOD_META;
-    public static final String NAME;
+    // Tên hiển thị của client
+    public static final String NAME = "SieuCapYeuEm";
     public static final Version VERSION;
     public static final String BUILD_NUMBER;
 
@@ -63,7 +65,7 @@ public class MeteorClient implements ClientModInitializer {
     static {
         MOD_META = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata();
 
-        NAME = MOD_META.getName();
+        // Logger sẽ dùng tên "SieuCapYeuEm"
         LOG = LoggerFactory.getLogger(NAME);
 
         String versionString = MOD_META.getVersion().getFriendlyString();
