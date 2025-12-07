@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "name": "Meteor Client",
-  "id": "meteor-client",
+  "name": "SieuCapYeuEm",
+  "id": "sieucapyeuem",
   "version": "${version}",
   "description": "Based utility mod.",
   "authors": [
