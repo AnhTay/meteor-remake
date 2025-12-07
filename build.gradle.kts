@@ -1,55 +1,86 @@
 plugins {
-    id("fabric-loom") version("1.2.7")
+    alias(libs.plugins.fabric.loom)
     id("maven-publish")
-    java
 }
 
-version = "1.21.4"
-group = "com.sieucapyeuem"
+base {
+    archivesName = "SieuCapYeuEm"
+    group = "com.sieucapyeuem"
+    version = libs.versions.minecraft.get() + "-local"
+}
 
 repositories {
-    // Maven chính thức của SieuCapYeuEm
     maven {
-        name = "SieuCapYeuEm-Maven"
+        name = "meteor-maven"
         url = uri("https://maven.meteordev.org/releases")
     }
-
-    // ⚙️ Maven chính thức của Fabric
+    maven {
+        name = "meteor-maven-snapshots"
+        url = uri("https://maven.meteordev.org/snapshots")
+    }
     maven {
         name = "FabricMC"
         url = uri("https://maven.fabricmc.net/")
     }
-
-    // Repo phổ biến cho các mod khác
     maven {
         name = "Terraformers"
-        url = uri("https://maven.terraformersmc.com/releases/")
-    }
-    maven {
-        name = "Architectury"
-        url = uri("https://maven.architectury.dev/")
+        url = uri("https://maven.terraformersmc.com")
     }
     mavenCentral()
-    mavenLocal()
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.21.4")
-    mappings("net.fabricmc:yarn:1.21.4+build.1:v2")
-    modImplementation("net.fabricmc:fabric-loader:0.16.9")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:0.137.0+1.21.4")
+    minecraft(libs.minecraft)
+    mappings(variantOf(libs.yarn) { classifier("v2") })
+    modImplementation(libs.fabric.loader)
+    modImplementation(libs.fabric.api)
 }
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-    withSourcesJar()
+loom {
+    accessWidenerPath = file("src/main/resources/sieucapyeuem.accesswidener")
 }
 
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
+tasks {
+    processResources {
+        val props = mapOf(
+            "version" to project.version,
+            "mod_id" to "sieucapyeuem",
+            "mod_name" to "SieuCapYeuEm",
+            "minecraft_version" to libs.versions.minecraft.get()
+        )
+
+        inputs.properties(props)
+        filesMatching("fabric.mod.json") {
+            expand(props)
+        }
+    }
+
+    jar {
+        from("LICENSE") {
+            rename { "${it}_${project.name}" }
+        }
+        manifest {
+            attributes["Main-Class"] = "com.sieucapyeuem.Main"
+        }
+    }
+
+    withType<JavaCompile> {
+        options.release.set(21)
+        options.encoding = "UTF-8"
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 }
 
-tasks.processResources {
-    filesMatching("fabric.mod.json") {
-        expand(
-            mapOf
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "sieucapyeuem"
+            version = libs.versions.minecraft.get() + "-SNAPSHOT"
+        }
+    }
+}
